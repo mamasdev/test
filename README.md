@@ -1,6 +1,4 @@
 # test
-test
-
 
 ```javascript
 const fs = require('fs');
@@ -24,3 +22,24 @@ function deleteFolderRecursive(folderPath) {
 
 function findAndDeleteFolders(rootDir, foldersToDelete) {
     fs.readdirSync(rootDir, { withFileTypes: true }).forEach((dirent) => {
+        const fullPath = path.join(rootDir, dirent.name);
+
+        if (dirent.isDirectory()) {
+            // Check if the directory is one of the target folders
+            if (foldersToDelete.includes(dirent.name)) {
+                deleteFolderRecursive(fullPath);
+            } else {
+                // Recurse into subdirectories
+                findAndDeleteFolders(fullPath, foldersToDelete);
+            }
+        }
+    });
+}
+
+// Specify the root directory to search
+const rootDirectory = path.resolve(__dirname, 'path_to_your_directory'); // Change this to your directory
+const foldersToDelete = ['node_modules', 'jspm_packages'];
+
+// Start the deletion process
+findAndDeleteFolders(rootDirectory, foldersToDelete);
+console.log('Deletion process completed.');
