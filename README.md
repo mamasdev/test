@@ -37,3 +37,24 @@ function resolveGraph(graph) {
 const response = require('./anypointResponse.json');
 const flattened = resolveGraph(response['@graph']);
 console.log(JSON.stringify(flattened, null, 2));
+import jsonld from 'jsonld';
+import fs from 'fs';
+
+// Load your Anypoint-style JSON (with @context + @graph)
+const doc = JSON.parse(fs.readFileSync('./anypoint-model.json', 'utf8'));
+
+(async () => {
+  // 1️⃣ Flatten merges all @id references into one graph map
+  const flattened = await jsonld.flatten(doc);
+
+  // 2️⃣ Optionally "frame" the document into a nested tree
+  // Replace the @type below with your root type, usually "#Api" or a full URI
+  const frame = {
+    "@context": doc["@context"],
+    "@type": "http://www.mulesoft.org/schema/model#Api"
+  };
+
+  const framed = await jsonld.frame(flattened, frame);
+
+  console.log(JSON.stringify(framed, null, 2));
+})();
